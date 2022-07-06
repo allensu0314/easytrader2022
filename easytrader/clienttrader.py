@@ -533,9 +533,7 @@ class ClientTrader(IClientTrader):
         count = 2
         while True:
             try:
-                handle = self._main.child_window(
-                    control_id=129, class_name="SysTreeView32"
-                )
+                handle = self._main.TreeView
                 if count <= 0:
                     return handle
                 # sometime can't find handle ready, must retry

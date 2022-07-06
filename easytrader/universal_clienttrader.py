@@ -5,6 +5,7 @@ import pywinauto.clipboard
 
 from easytrader import grid_strategies
 from . import clienttrader
+from contextlib import redirect_stdout
 
 
 class UniversalClientTrader(clienttrader.BaseLoginClientTrader):
@@ -24,37 +25,9 @@ class UniversalClientTrader(clienttrader.BaseLoginClientTrader):
         :return:
         """
         self._editor_need_type_keys = False
-
-        try:
-            self._app = pywinauto.Application().connect(
-                path=self._run_exe_path(exe_path), timeout=1
-            )
-        # pylint: disable=broad-except
-        except Exception:
-            self._app = pywinauto.Application().start(exe_path)
-
-            # wait login window ready
-            while True:
-                try:
-                    login_window = pywinauto.findwindows.find_window(class_name='#32770', found_index=1)
-                    break
-                except:
-                    self.wait(1)
-
-            self.wait(1)
-            self._app.window(handle=login_window).Edit1.set_focus()
-            self._app.window(handle=login_window).Edit1.type_keys(user)
-
-            self._app.window(handle=login_window).button7.click()
-
-            # detect login is success or not
-            # self._app.top_window().wait_not("exists", 100)
-            self.wait(5)
-
-            self._app = pywinauto.Application().connect(
-                path=self._run_exe_path(exe_path), timeout=10
-            )
-
-        self._close_prompt_windows()
-        self._main = self._app.window(title="网上股票交易系统5.0")
-
+        self._app = pywinauto.Application(backend="uia").connect(path=exe_path, timeout=10)
+        dlg = self._app.window(title='同花顺远航版')
+        # dlg.Button5.click()
+        # dlg['交易Dialog'].menu_select("模拟炒股 - UI**57")
+        # dlg = dlg.window(title="网上股票交易系统5.0")    
+        self._main = dlg.window(title="网上股票交易系统5.0")
